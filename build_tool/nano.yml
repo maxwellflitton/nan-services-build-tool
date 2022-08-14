@@ -1,0 +1,7 @@
+services:
+  - name: one
+    service_type: git
+    url: "https://test.com"
+  - name: two
+    service_type: docker
+    url: "https://test_two.com"
