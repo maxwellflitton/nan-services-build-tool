@@ -35,14 +35,14 @@ jobs:
         with:
           use-cross: true
           command: build
-          working-directory: ./build_tool/Cargo.toml
+          # working-directory: ./build_tool/Cargo.toml
           args: --release --target ${{ matrix.target }} --manifest-path ./build_tool/Cargo.toml
 
       - name: Package
         shell: bash
         run: |
           #strip target/${{ matrix.target }}/release/build_tool
-          cd target/${{ matrix.target }}/release          
+          cd build_tool/target/${{ matrix.target }}/release          
           tar czvf ../../../build_tool-${{ matrix.target }}.tar.gz build_tool
           cd -
       - name: Publish
