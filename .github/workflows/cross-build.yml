@@ -35,6 +35,7 @@ jobs:
         with:
           use-cross: true
           command: build
+          working-directory: ./build_tool
           args: --release --target ${{ matrix.target }}
 
       - name: Package
