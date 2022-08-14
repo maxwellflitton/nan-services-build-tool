@@ -33,7 +33,7 @@ jobs:
             x86_64-unknown-linux-gnu,
             x86_64-unknown-linux-musl,
             aarch64-apple-darwin,
-            x86_64-apple-darwin
+            # x86_64-apple-darwin
           ]
     steps:
       - name: Checkout
@@ -46,23 +46,22 @@ jobs:
           override: true
           target: ${{ matrix.target }}
 
-      - name: Install support for Apple
-        shell: bash
-        run: |
-          git clone https://github.com/cross-rs/cross
-          cd cross
-          git submodule update --init --remote
-          cd ..
-          rm -rf cross
-          
       - name: Build target
+        if: matrix.target != 'aarch64-apple-darwin'
         uses: actions-rs/cargo@v1
         with:
           use-cross: true
           command: build
           args: --release --target ${{ matrix.target }} --manifest-path ./build_tool/Cargo.toml
 
+      - name: Build Apple targets
+        shell: bash
+        run: |
+          rustup target add aarch64-apple-darwin
+          cargo build --release --target aarch64-apple-darwin --manifest-path ./build_tool/Cargo.toml
+
       - name: Package
+        if: matrix.target == 'aarch64-apple-darwin'
         shell: bash
         run: |
           #strip target/${{ matrix.target }}/release/build_tool     
