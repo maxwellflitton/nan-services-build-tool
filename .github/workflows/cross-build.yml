@@ -60,7 +60,7 @@ jobs:
         shell: bash
         run: |
           rustup target add aarch64-apple-darwin
-          cargo build --release --target aarch64-apple-darwin --manifest-path ./build_tool/Cargo.toml
+          cargo build --release --target ${{ matrix.config.target }} --manifest-path ./build_tool/Cargo.toml
 
       - name: Package
         shell: bash
