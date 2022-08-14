@@ -16,25 +16,26 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        target:
-          [
-            aarch64-unknown-linux-gnu,
-            armv7-unknown-linux-gnueabihf,
-            i686-unknown-linux-gnu,
-            i686-unknown-linux-musl,
-            mips-unknown-linux-gnu,
-            mips64-unknown-linux-gnuabi64,
-            mips64el-unknown-linux-gnuabi64,
-            mipsel-unknown-linux-gnu,
-            powerpc-unknown-linux-gnu,
-            powerpc64-unknown-linux-gnu,
-            powerpc64le-unknown-linux-gnu,
-            arm-unknown-linux-gnueabi,
-            x86_64-unknown-linux-gnu,
-            x86_64-unknown-linux-musl,
-            aarch64-apple-darwin,
-            # x86_64-apple-darwin
-          ]
+        config:
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+          - os: ubuntu-latest
+            target: armv7-unknown-linux-gnueabihf
+          - os: ubuntu-latest
+            target: i686-unknown-linux-gnu
+          - os: ubuntu-latest
+            target: i686-unknown-linux-musl
+          - os: ubuntu-latest
+            target: arm-unknown-linux-gnueabi
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+
+          - os: macOS-latest
+            target: aarch64-apple-darwin
+          - os: macOS-latest
+            target: x86_64-apple-darwin
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -44,28 +45,28 @@ jobs:
           toolchain: stable
           profile: minimal
           override: true
-          target: ${{ matrix.target }}
+          target: ${{ matrix.config.target }}
 
       - name: Build target
-        if: matrix.target != 'aarch64-apple-darwin'
+        if: matrix.config.os == 'ubuntu-latest'
         uses: actions-rs/cargo@v1
         with:
           use-cross: true
           command: build
-          args: --release --target ${{ matrix.target }} --manifest-path ./build_tool/Cargo.toml
+          args: --release --target ${{ matrix.config.target }} --manifest-path ./build_tool/Cargo.toml
 
       - name: Build Apple targets
+        if: matrix.config.os == 'macOS-latest'
         shell: bash
         run: |
           rustup target add aarch64-apple-darwin
           cargo build --release --target aarch64-apple-darwin --manifest-path ./build_tool/Cargo.toml
 
       - name: Package
-        if: matrix.target == 'aarch64-apple-darwin'
         shell: bash
         run: |
-          #strip target/${{ matrix.target }}/release/build_tool     
-          tar -czvf ./build_tool-${{ matrix.target }}.tar.gz -C build_tool/target/${{ matrix.target }}/release/ build_tool
+          #strip target/${{ matrix.config.target }}/release/build_tool     
+          tar -czvf ./build_tool-${{ matrix.config.target }}.tar.gz -C build_tool/target/${{ matrix.config.target }}/release/ build_tool
       - name: Publish
         uses: softprops/action-gh-release@v1
         # TODO: if any of the build step fails, the release should be deleted.
