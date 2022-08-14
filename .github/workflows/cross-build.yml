@@ -35,8 +35,8 @@ jobs:
         with:
           use-cross: true
           command: build
-          working-directory: ./build_tool
-          args: --release --target ${{ matrix.target }}
+          working-directory: ./build_tool/Cargo.toml
+          args: --release --target ${{ matrix.target }} --manifest-path ./build_tool/Cargo.toml
 
       - name: Package
         shell: bash
