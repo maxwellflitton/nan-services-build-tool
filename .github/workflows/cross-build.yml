@@ -14,7 +14,7 @@ jobs:
 
   deploy:
     name: deploy
-    # if: startsWith(github.ref, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     strategy: 
       matrix:
@@ -41,8 +41,7 @@ jobs:
         shell: bash
         run: |
           #strip target/${{ matrix.target }}/release/build_tool     
-          tar czvf ./build_tool-${{ matrix.target }}.tar.gz build_tool/target/${{ matrix.target }}/release/build_tool
-          cd -
+          tar -czvf ./build_tool-${{ matrix.target }}.tar.gz build_tool/target/${{ matrix.target }}/release/build_tool
       - name: Publish
         uses: softprops/action-gh-release@v1
         # TODO: if any of the build step fails, the release should be deleted.
